@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-
-	"github.com/TonyPath/apiserver/middleware"
+	"github.com/TonyPath/apiserver/router"
 )
 
 const (
-	httpPort            = 50000
+	httpPort            = 8080
 	httpReadTimeout     = 30 * time.Second
 	httpWriteTimeout    = 60 * time.Second
 	shutdownGracePeriod = 5 * time.Second
@@ -28,12 +26,12 @@ func newDefaultConfig() *Config {
 }
 
 type ApiServer struct {
-	config  *Config
-	mux     *chi.Mux
-	httpSrv *http.Server
+	config    *Config
+	apiRouter *router.APIRouter
+	httpSrv   *http.Server
 }
 
-func New(opts ...Option) (*ApiServer, error) {
+func New(apiRouter *router.APIRouter, opts ...Option) (*ApiServer, error) {
 	cfg := newDefaultConfig()
 
 	for _, opt := range opts {
@@ -43,17 +41,11 @@ func New(opts ...Option) (*ApiServer, error) {
 	}
 
 	apiSrv := ApiServer{
-		mux:    chi.NewRouter(),
-		config: cfg,
+		apiRouter: apiRouter,
+		config:    cfg,
 	}
 
 	return &apiSrv, nil
-}
-
-func (apiSrv *ApiServer) Handle(method string, path string, handler http.HandlerFunc) {
-	hdl := middleware.Wrap(handler, middleware.Recover())
-
-	apiSrv.mux.Method(method, path, hdl)
 }
 
 func (apiSrv *ApiServer) Run(ctx context.Context) error {
@@ -61,7 +53,7 @@ func (apiSrv *ApiServer) Run(ctx context.Context) error {
 		Addr:         fmt.Sprintf(":%d", apiSrv.config.port),
 		ReadTimeout:  apiSrv.config.readTimeout,
 		WriteTimeout: apiSrv.config.writeTimeout,
-		Handler:      apiSrv.mux,
+		Handler:      apiSrv.apiRouter,
 	}
 	apiSrv.httpSrv = srv
 

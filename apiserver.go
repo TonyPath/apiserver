@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	// internal
 	"github.com/TonyPath/apiserver/router"
 )
 
@@ -64,7 +65,7 @@ func (apiSrv *ApiServer) Run(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		if err := apiSrv.shutdown(ctx); err != nil {
+		if err := apiSrv.Shutdown(); err != nil {
 			return err
 		}
 		return ctx.Err()
@@ -73,11 +74,11 @@ func (apiSrv *ApiServer) Run(ctx context.Context) error {
 	}
 }
 
-func (apiSrv *ApiServer) shutdown(ctx context.Context) error {
-	tctx, cancel := context.WithTimeout(context.Background(), shutdownGracePeriod)
+func (apiSrv *ApiServer) Shutdown() error {
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownGracePeriod)
 	defer cancel()
 
-	if err := apiSrv.httpSrv.Shutdown(tctx); err != nil {
+	if err := apiSrv.httpSrv.Shutdown(ctx); err != nil {
 		_ = apiSrv.httpSrv.Close()
 		return fmt.Errorf("cannot stop api server gracefully: %w", err)
 	}

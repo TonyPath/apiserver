@@ -4,6 +4,6 @@
 [![go.mod Go version](https://img.shields.io/github/go-mod/go-version/TonyPath/apiserver)](https://github.com/TonyPath/apiserver)
 [![GoDoc](https://godoc.org/github.com/TonyPath/apiserver?status.svg)](https://godoc.org/github.com/TonyPath/apiserver)
  
-API Http Server in Go
+HTTP API Server in Go
 
 ## WIP

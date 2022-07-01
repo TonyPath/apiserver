@@ -32,7 +32,7 @@ type ApiServer struct {
 	httpSrv   *http.Server
 }
 
-func New(apiRouter *router.APIRouter, opts ...Option) (*ApiServer, error) {
+func New(apiRouter *router.APIRouter, opts ...ServerConfig) (*ApiServer, error) {
 	cfg := newDefaultConfig()
 
 	for _, opt := range opts {

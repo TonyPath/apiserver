@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	// internal
-	"github.com/TonyPath/apiserver/router"
 )
 
 const (
@@ -26,13 +23,13 @@ func newDefaultConfig() *Config {
 	}
 }
 
-type ApiServer struct {
-	config    *Config
-	apiRouter *router.APIRouter
-	httpSrv   *http.Server
+type APIServer struct {
+	config  *Config
+	router  *Router
+	httpSrv *http.Server
 }
 
-func New(apiRouter *router.APIRouter, opts ...ServerConfig) (*ApiServer, error) {
+func New(router *Router, opts ...ServerConfig) (*APIServer, error) {
 	cfg := newDefaultConfig()
 
 	for _, opt := range opts {
@@ -41,20 +38,20 @@ func New(apiRouter *router.APIRouter, opts ...ServerConfig) (*ApiServer, error) 
 		}
 	}
 
-	apiSrv := ApiServer{
-		apiRouter: apiRouter,
-		config:    cfg,
+	apiSrv := APIServer{
+		router: router,
+		config: cfg,
 	}
 
 	return &apiSrv, nil
 }
 
-func (apiSrv *ApiServer) Run(ctx context.Context) error {
+func (apiSrv *APIServer) Run(ctx context.Context) error {
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", apiSrv.config.port),
 		ReadTimeout:  apiSrv.config.readTimeout,
 		WriteTimeout: apiSrv.config.writeTimeout,
-		Handler:      apiSrv.apiRouter,
+		Handler:      apiSrv.router,
 	}
 	apiSrv.httpSrv = srv
 
@@ -74,7 +71,7 @@ func (apiSrv *ApiServer) Run(ctx context.Context) error {
 	}
 }
 
-func (apiSrv *ApiServer) Shutdown() error {
+func (apiSrv *APIServer) Shutdown() error {
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownGracePeriod)
 	defer cancel()
 

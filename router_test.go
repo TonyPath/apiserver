@@ -1,4 +1,4 @@
-package router
+package apiserver
 
 import (
 	"io/ioutil"
@@ -11,7 +11,7 @@ import (
 
 func TestApiRouter(t *testing.T) {
 
-	router := NewApiRouter()
+	router := NewRouter()
 	router.Handle(http.MethodGet, "/", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`hello api router`))
 	})
@@ -28,7 +28,7 @@ func TestApiRouter(t *testing.T) {
 
 func TestApiRouter_Panic(t *testing.T) {
 
-	router := NewApiRouter()
+	router := NewRouter()
 	router.Handle(http.MethodGet, "/", func(w http.ResponseWriter, r *http.Request) {
 		panic("sth terrible happened")
 	})

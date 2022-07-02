@@ -2,15 +2,15 @@ package apiserver
 
 import (
 	"context"
-	"github.com/TonyPath/apiserver/router"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestRun(t *testing.T) {
 
-	r := router.NewApiRouter()
+	r := NewRouter()
 
 	apiSrv, err := New(r, WithPort(8080), WithReadTimeout(1*time.Second))
 	require.NoError(t, err)
